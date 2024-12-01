@@ -1,13 +1,12 @@
-;; -*- advent-of-code-date: (2024 1); -*-
+;; -*- aoc-date: (2024 1); -*-
 
-;; move to util class
-(defun read-lines (path)
-  (with-temp-buffer
-    (insert-file-contents path)
-    (split-string (buffer-string) "\n" t)))
+(require 'advent-of-code)
+
+
+
 
 ;; part A
-(let* ((data (read-lines "input/01.txt"))
+(let* ((data (aoc-read-input aoc-date))
        (left (seq-sort '< (mapcar (lambda (line)
 				    (string-to-number (car (split-string line "\s" t " "))))
 				  data)))
@@ -22,11 +21,11 @@
       (setq left (cdr left)
 	    right (cdr right)
 	    sum (+ sum (abs (- a b))))))
-  (message "part A: %d" sum))
+  (aoc-answer sum))
 
 
 ;; Part B
-(let* ((data (read-lines "input/01.txt"))
+(let* ((data (aoc-read-input aoc-date))
        (left (seq-sort '< (mapcar (lambda (line)
 				    (string-to-number (car (split-string line "\s" t " "))))
 				  data)))
@@ -39,7 +38,7 @@
 							       (= a b))
 							     right))))
 				  left))))
-  (message "answer B: %d" answer))
+  (aoc-answer answer))
 
 
 	    

@@ -1,9 +1,12 @@
 #+TITLE: AoC2024
 
-* Code
-#+begin_src emacs-lisp :tangle ~/.emacs.d/lisp/aoc.el
-  ;;;
+* Solutions
+- [[file:day-01.el][Day 01]]
 
+* Code
+#+begin_src emacs-lisp :tangle ~/.emacs.d/lisp/advent-of-code.el
+  ;; -*- lexical-binding: t -*-
+  
   (require 'request)
 
   (defvar aoc-cookie nil
@@ -13,9 +16,20 @@
     "path format to advent of code solutions, use of dateformatters allowed")
 
   (defvar aoc-input-path-format nil
-     "path format to advent of code input, use of dateformatters allowed")
+    "path format to advent of code input, use of dateformatters allowed")
+
+  (unless aoc-input-path-format (setq aoc-input-path-format "input/%02d.txt"))
 
   (defvar aoc-current-date nil)
+
+  (defun aoc-input-path (date)
+    (format aoc-input-path-format (cadr date)))
+
+  (defun aoc-read-input (&optional date)
+    (with-temp-buffer
+      (insert-file-contents (aoc-input-path (or date aoc-date)))
+      (split-string (buffer-string) "\n" t)))
+
 
   (cl-defun aoc-open-solution ())
   (cl-defun aoc-install-from-template ())
@@ -32,14 +46,18 @@
 
   (cl-defun aoc-download-input (&optional date)
     (interactive)
-    (cl-letf ((url (aoc--input-url (aoc--get-date date)))
-  	    (date date))
+    (let* ((date (aoc--get-date date))
+    	 (lexical-binding t)
+    	 (url (aoc--input-url date)))
       (request url
-        ;:sync t
+    					;:sync t
         :headers (list (cons 'cookie (format "session=%s" aoc-cookie)))
-        :success (cl-function (lambda (&key data &allow-other-keys)
-  			       (message data)
-  			       (message date))))))
+        :complete (cl-function (lambda (&key data &allow-other-keys)
+        			       (let ((path (aoc-input-path date)))
+    				 (with-temp-buffer
+    				   (insert data)
+    				   (write-file path))
+    				 (message "Written input to: %s" path)))))))
 
   (defun aoc--input-url (date)
     (format "https://adventofcode.com/%d/day/%d/input" (car date) (cadr date)))
@@ -47,6 +65,12 @@
   (defun aoc--puzzle-url (date)
     (format "https://adventofcode.com/%d/day/%d" (car date) (cadr date)))
 
+  (defun aoc-answer (answer)
+    (let ((answer (if (numberp answer)
+  		    (number-to-string answer)
+  		  answer)))
+      (kill-new answer)
+      (message "Answer: %s" answer)))
   (provide 'advent-of-code)
 
   ;; Local Variables:
