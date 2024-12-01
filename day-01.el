@@ -2,9 +2,6 @@
 
 (require 'advent-of-code)
 
-
-
-
 ;; part A
 (let* ((data (aoc-read-input aoc-date))
        (left (seq-sort '< (mapcar (lambda (line)

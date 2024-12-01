@@ -3,12 +3,13 @@
 * Solutions
 - [[file:day-01.el][Day 01]]
 
-* Code
+* Toolkit
+The code below can be tangled into your elisp load path to provide af ew convenience methods like =aoc-open-in-browser= and =aoc-download-input=.  place the contents of the =session== cookie into =.cookie= at project root and downloading puzzle input will be a breeze.
 #+begin_src emacs-lisp :tangle ~/.emacs.d/lisp/advent-of-code.el
   ;; -*- lexical-binding: t -*-
-  
-  (require 'request)
 
+  (require 'request)
+  (setq lexical-binding t)
   (defvar aoc-cookie nil
     "cookie used to grab puzzle input")
 
@@ -25,11 +26,14 @@
   (defun aoc-input-path (date)
     (format aoc-input-path-format (cadr date)))
 
-  (defun aoc-read-input (&optional date)
+  (defun aoc-read-file (path)
     (with-temp-buffer
       (insert-file-contents (aoc-input-path (or date aoc-date)))
-      (split-string (buffer-string) "\n" t)))
+      (buffer-string)))
 
+
+  (defun aoc-read-input (&optional date)
+    (split-string (aoc-read-file) "\n" t))
 
   (cl-defun aoc-open-solution ())
   (cl-defun aoc-install-from-template ())
@@ -51,13 +55,13 @@
     	 (url (aoc--input-url date)))
       (request url
     					;:sync t
-        :headers (list (cons 'cookie (format "session=%s" aoc-cookie)))
+        :headers (list (cons 'cookie (format "session=%s" (aoc-read-file ".cookie"))))
         :complete (cl-function (lambda (&key data &allow-other-keys)
         			       (let ((path (aoc-input-path date)))
     				 (with-temp-buffer
     				   (insert data)
     				   (write-file path))
-    				 (message "Written input to: %s" path)))))))
+    				 (message "Written input to: %s" path)))))))t
 
   (defun aoc--input-url (date)
     (format "https://adventofcode.com/%d/day/%d/input" (car date) (cadr date)))
@@ -71,6 +75,7 @@
   		  answer)))
       (kill-new answer)
       (message "Answer: %s" answer)))
+
   (provide 'advent-of-code)
 
   ;; Local Variables:
