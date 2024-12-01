@@ -1,0 +1,55 @@
+#+TITLE: AoC2024
+
+* Code
+#+begin_src emacs-lisp :tangle ~/.emacs.d/lisp/aoc.el
+  ;;;
+
+  (require 'request)
+
+  (defvar aoc-cookie nil
+    "cookie used to grab puzzle input")
+
+  (defvar aoc-solutiion-path-format nil
+    "path format to advent of code solutions, use of dateformatters allowed")
+
+  (defvar aoc-input-path-format nil
+     "path format to advent of code input, use of dateformatters allowed")
+
+  (defvar aoc-current-date nil)
+
+  (cl-defun aoc-open-solution ())
+  (cl-defun aoc-install-from-template ())
+
+  (cl-defun aoc-open-in-browser (&optional date)
+    "open day in browser"
+    (interactive)
+    (browse-url (aoc--puzzle-url (aoc--get-date date))))
+
+  (defun aoc--get-date (date)
+    (list
+     (or (when date (car date)) (read-number "Year: " 2024))
+     (or (when date (cadr date)) (read-number "Day: "))))
+
+  (cl-defun aoc-download-input (&optional date)
+    (interactive)
+    (cl-letf ((url (aoc--input-url (aoc--get-date date)))
+  	    (date date))
+      (request url
+        ;:sync t
+        :headers (list (cons 'cookie (format "session=%s" aoc-cookie)))
+        :success (cl-function (lambda (&key data &allow-other-keys)
+  			       (message data)
+  			       (message date))))))
+
+  (defun aoc--input-url (date)
+    (format "https://adventofcode.com/%d/day/%d/input" (car date) (cadr date)))
+
+  (defun aoc--puzzle-url (date)
+    (format "https://adventofcode.com/%d/day/%d" (car date) (cadr date)))
+
+  (provide 'advent-of-code)
+
+  ;; Local Variables:
+  ;; read-symbol-shorthands: (("aoc-" . "advent-of-code-"))
+  ;; End:
+#+end_src
