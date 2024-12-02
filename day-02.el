@@ -14,15 +14,12 @@
     (<= h 3)))
 
 (defun aoc-normalize-line (line)
-  (if (stringp line)
-      (mapcar 'string-to-number (string-split line " " t " "))
-    line))
+  (mapcar 'string-to-number (string-split line " " t " ")))
 
-(defun aoc-report-valid-p (line)
-  (let ((data line))
-    (and (apply 'max-3-diff-p data)
-	 (or (apply '> data)
-	     (apply '< data)))))
+(defun aoc-report-valid-p (data)
+  (and (apply 'max-3-diff-p data)
+       (or (apply '> data)
+	   (apply '< data))))
 
 (aoc-answer 
  (let ((data (aoc-read-input aoc-date)))
@@ -30,11 +27,10 @@
 		       (mapcar 'aoc-normalize-line data)))))
 
 (defun aoc-report-valid-dampened-p (line &optional i)
-    (let ((i (or i 0))
-	  (data line))
-    (or (aoc-report-valid-p (seq-remove-at-position data i))
-	(and (< (1+ i) (length data))
-	     (aoc-report-valid-dampened-p data (+ 1 i))))))
+    (let ((i (or i 0)))
+    (or (aoc-report-valid-p (seq-remove-at-position line i))
+	(and (< (1+ i) (length line))
+	     (aoc-report-valid-dampened-p line (+ 1 i))))))
 
 (aoc-answer 
  (let ((data (aoc-read-input aoc-date)))
