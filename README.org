@@ -2,6 +2,8 @@
 
 * Solutions
 - [[file:day-01.el][Day 01]]
+- [[file:day-02.el][Day 02]]
+- [[file:day-03.el][Day 03]]
 
 * Toolkit
 The code below can be tangled into your elisp load path to provide af ew convenience methods like =aoc-open-in-browser= and =aoc-download-input=.  place the contents of the =session== cookie into =.cookie= at project root and downloading puzzle input will be a breeze.
