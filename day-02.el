@@ -26,6 +26,8 @@
    (length (seq-filter 'aoc-report-valid-p
 		       (mapcar 'aoc-normalize-line data)))))
 
+
+;; Part B
 (defun aoc-report-valid-dampened-p (line &optional i)
     (let ((i (or i 0)))
     (or (aoc-report-valid-p (seq-remove-at-position line i))

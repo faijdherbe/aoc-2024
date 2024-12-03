@@ -2,7 +2,7 @@
 
 (require 'advent-of-code)
 
-;;; Part 1
+;;; Part A
 (defun aoc-parse-mul (line)
   (let ((aoc-mul-regexp "mul(\\([0-9]+\\),\\([0-9]+\\))"))
     (when (string-match-p aoc-mul-regexp line)
@@ -18,7 +18,7 @@
 			      (aoc-read-input))))
 
   
-;;; Part 2
+;;; Part B
 (let ((line (string-join (aoc-read-input) ""))
       (enabled t)
       (regexp "mul(\\([0-9]+\\),\\([0-9]+\\))\\|do()\\|don't()")
