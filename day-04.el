@@ -51,9 +51,40 @@
 
 
 ;;; Part A
-(aoc-answer
+(aoc-answer 
  (length
   (aoc-find-occurances
    "XMAS"
+   (aoc-build-map (aoc-read-input)))))
+
+;;; Part B
+
+(defun aoc-has-xmas (map loc)
+  (and (or (and (eq ?M (aoc-char-from-map map (aoc-translate loc (cons -1 1))))
+		(eq ?S (aoc-char-from-map map (aoc-translate loc (cons 1 -1)))))
+	   (and (eq ?S (aoc-char-from-map map (aoc-translate loc (cons -1 1))))
+		(eq ?M (aoc-char-from-map map (aoc-translate loc (cons 1 -1))))))
+       
+       (or (and (eq ?M (aoc-char-from-map map (aoc-translate loc (cons 1 1))))
+		(eq ?S (aoc-char-from-map map (aoc-translate loc (cons -1 -1)))))
+	   (and (eq ?S (aoc-char-from-map map (aoc-translate loc (cons 1 1))))
+		(eq ?M (aoc-char-from-map map (aoc-translate loc (cons -1 -1))))))))
+
+	       
+
+(defun aoc-find-occurances-xmas (map)
+  (let ((result '()))
+    (let-alist map
+      (dotimes (y .dim.h)
+	(dotimes (x .dim.w)
+	  (when (eq ?A (aoc-char-from-map map (cons x y)))
+	    (when (aoc-has-xmas map (cons x y))
+	      (add-to-list 'result `((loc . ,(cons x y)))))))))
+				     
+    result))
+
+(aoc-answer 
+ (length
+  (aoc-find-occurances-xmas
    (aoc-build-map (aoc-read-input)))))
 
