@@ -58,9 +58,14 @@ The code below can be tangled into your elisp load path to provide af ew conveni
       (write-file path))
     (find-file path)))
 
+(defun aoc-load-and-store-cookie ()
+  (when (file-exists-p ".cookie")
+    (url-cookie-store "session" (string-trim (aoc-read-file ".cookie")) nil ".adventofcode.com" "/")))
+
 (cl-defun aoc-open-in-browser (&optional date)
   "open day in browser"
   (interactive)
+  (aoc-load-and-store-cookie)
   (browse-url (aoc--puzzle-url (aoc--get-date date))))
 
 (defun aoc--read-date ()
