@@ -17,16 +17,14 @@ The code below can be tangled into your elisp load path to provide af ew conveni
 #+begin_src emacs-lisp :tangle ~/.emacs.d/lisp/advent-of-code.el
 (require 'request)
 
-(defvar aoc-cookie nil
-  "cookie used to grab puzzle input")
-
-(defvar aoc-solutiion-path-format nil
+(defvar aoc-solution-path-format nil
   "path format to advent of code solutions, use of dateformatters allowed")
 
 (defvar aoc-input-path-format nil
   "path format to advent of code input, use of dateformatters allowed")
 
 (unless aoc-input-path-format (setq aoc-input-path-format "input/%02d.txt"))
+(unless aoc-solution-path-format (setq aoc-solution-path-format "day-%02d.el"))
 
 (defvar aoc-current-date nil)
 
@@ -34,34 +32,56 @@ The code below can be tangled into your elisp load path to provide af ew conveni
   (format aoc-input-path-format (cadr date)))
 
 (defun aoc-read-file (path)
+  (unless (file-exists-p path)
+    (when (y-or-no-p "Input not found, download now?")
+      (aoc-download-input)))
   (with-temp-buffer
     (insert-file-contents path)
     (buffer-string)))
 
 
-(defun aoc-read-input (&optional date)
-  (split-string (aoc-read-file (aoc-input-path (or date aoc-date))) "\n" t))
+(defun aoc-read-input (&optional date parser)
+  (let* ((date (aoc--get-date))
+         (file (aoc-read-file (aoc-input-path date))))
+    (if parser
+        (funcall parser file)
+      (split-string file "\n" t))))
 
-(cl-defun aoc-open-solution ())
-(cl-defun aoc-install-from-template ())
+(defun aoc-install-from-template ()
+  (interactive)
+  (let* ((date (aoc--read-date))
+         (path (format aoc-solution-path-format (cadr date))))
+    (with-temp-buffer
+      (insert (format ";; -*- aoc-date: (%d %d); -*-\n\n" (car date) (cadr date)))
+      (insert "(require 'advent-of-code)\n\n")
+      (write-file path))
+    (find-file path)))
 
 (cl-defun aoc-open-in-browser (&optional date)
   "open day in browser"
   (interactive)
   (browse-url (aoc--puzzle-url (aoc--get-date date))))
 
-(defun aoc--get-date (date)
-  (list
-   (or (when date (car date)) (read-number "Year: " 2024))
-   (or (when date (cadr date)) (read-number "Day: "))))
+(defun aoc--read-date ()
+  (let ((date (org-time-string-to-seconds (org-read-date))))
+    (list (string-to-number (format-time-string "%Y" date))
+          (string-to-number (format-time-string "%d" date)))))
+
+
+(defun aoc--get-date (&optional date)
+  (let ((date (or date
+                  (if (boundp 'aoc-date)
+                      aoc-date
+                    (aoc--read-date)))))
+    date))
 
 (cl-defun aoc-download-input (&optional date)
   (interactive)
-  (cl-letf* ((date (aoc--get-date date))
+  (cl-letf* ((date (aoc--read-date date))
     	     (url (aoc--input-url date)))
     (request url
       :sync t
-      :headers (list (cons 'cookie (format "session=%s" (aoc-read-file ".cookie"))))
+      :headers (list (cons 'cookie (format "session=%s" (string-trim (aoc-read-file ".cookie")))))
       :complete (cl-function (lambda (&key data &allow-other-keys)
         		       (let ((path (aoc-input-path date)))
     				 (with-temp-buffer
@@ -83,9 +103,8 @@ The code below can be tangled into your elisp load path to provide af ew conveni
     (message "Answer: %s" answer)))
 
 (provide 'advent-of-code)
-
-;; Local Variables:
-;; read-symbol-shorthands: (("aoc-" . "advent-of-code-"))
-;; End:
 #+end_src
+
+#+RESULTS:
+: advent-of-code
 

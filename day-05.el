@@ -63,5 +63,3 @@
 	  (middles (mapcar 'aoc-take-middle updates))
 	  (middles (mapcar 'string-to-number middles)))
      (apply '+ middles))))
-
-
