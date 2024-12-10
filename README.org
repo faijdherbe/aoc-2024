@@ -78,7 +78,7 @@ The code below can be tangled into your elisp load path to provide af ew conveni
 
 (cl-defun aoc-download-input (&optional date)
   (interactive)
-  (cl-letf* ((date (aoc--read-date date))
+  (cl-letf* ((date (or date (aoc--read-date)))
     	     (url (aoc--input-url date)))
     (request url
       :sync t
