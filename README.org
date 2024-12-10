@@ -32,20 +32,21 @@ The code below can be tangled into your elisp load path to provide af ew conveni
   (format aoc-input-path-format (cadr date)))
 
 (defun aoc-read-file (path)
-  (unless (file-exists-p path)
-    (when (y-or-no-p "Input not found, download now?")
-      (aoc-download-input)))
   (with-temp-buffer
     (insert-file-contents path)
     (buffer-string)))
 
 
 (defun aoc-read-input (&optional date parser)
-  (let* ((date (aoc--get-date))
-         (file (aoc-read-file (aoc-input-path date))))
-    (if parser
-        (funcall parser file)
-      (split-string file "\n" t))))
+  (let* ((date (aoc--get-date date))
+         (path (aoc-input-path date)))
+    (unless (file-exists-p path)
+      (when (y-or-n-p "Input not found, download now?")
+        (aoc-download-input date)))
+    (let ((file (aoc-read-file path)))         
+      (if parser
+          (funcall parser file)
+        (split-string file "\n" t)))))
 
 (defun aoc-install-from-template ()
   (interactive)
