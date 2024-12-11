@@ -18,13 +18,13 @@
 (defun aoc-process (stone iterations)
   (let ((stones (aoc-blink stone)))
     (if (> iterations 1)
-	(apply '+ (mapcar (lambda (st)
+	(reduce '+ (mapcar (lambda (st)
 			    (aoc-process st (1- iterations)))
 			  stones))
       (length stones))))
 
 (defun aoc-blink-stones (input count)
-   (apply '+ (mapcar (lambda (st)
+   (reduce '+ (mapcar (lambda (st)
 		       (aoc-process st count))
 		     input)))  
 
@@ -42,17 +42,19 @@
 	 (cached-value (gethash key aoc-stone-cache)))
     (if (identity cached-value)
 	cached-value
-      (let ((v (apply orig-fun args)))
+      (let ((v (funcall orig-fun (car args) (cadr args))))
 	(puthash key v aoc-stone-cache)
 	v))))
 
 (advice-add 'aoc-process :around #'aoc-process-cached)
 
-
 (setq aoc-stone-cache (make-hash-table :test 'equal))
+
 (aoc-answer
  (aoc-blink-stones
   (mapcar 'string-to-number
 	  (aoc-read-input nil 'string-split))
   75))
+
+
 
