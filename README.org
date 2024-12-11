@@ -10,6 +10,8 @@
 - Day 07  
 - [[file:day-08.el][Day 08]]
 - [[file:day-09.el][Day 09]] (partial)
+- Day 10  
+- [[file:day-11.el][Day 11]]
 
   
 * Toolkit
