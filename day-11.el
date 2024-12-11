@@ -34,3 +34,25 @@
   (mapcar 'string-to-number
 	  (aoc-read-input nil 'string-split))
   25))
+
+;; Part B
+
+(defun aoc-process-cached (orig-fun &rest args)
+  (let* ((key (cons (car args) (cadr args)))
+	 (cached-value (gethash key aoc-stone-cache)))
+    (if (identity cached-value)
+	cached-value
+      (let ((v (apply orig-fun args)))
+	(puthash key v aoc-stone-cache)
+	v))))
+
+(advice-add 'aoc-process :around #'aoc-process-cached)
+
+
+(setq aoc-stone-cache (make-hash-table :test 'equal))
+(aoc-answer
+ (aoc-blink-stones
+  (mapcar 'string-to-number
+	  (aoc-read-input nil 'string-split))
+  75))
+
