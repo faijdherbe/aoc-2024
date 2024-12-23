@@ -79,27 +79,34 @@
       (setq data (cdr data)))
     out))
 
+(defun aoc-find-price-points (prices)
+  (let ((groups (make-hash-table :test 'equal)))
+    (dotimes (i (- (length seller) 4))
+      (let* ((part (take 5 seller))
+	     (key (aoc-calc-key part))
+	     (v (car part)))
+	(puthash key v groups)
+        (setq seller (cdr seller))))
+    groups))
+       
+
 (let* ((input (aoc-read-input))
        (input (mapcar 'string-to-number input))
        (input (mapcar (lambda (x)
 		(aoc-calc-prices x 2000))
 	      input))
        (input (mapcar (lambda (x)
-
-			 (mapcar (lambda (x) (% x 10))
-				 x))
+			 (mapcar (lambda (x) (% x 10)) x))
 		      input))
        (groups (make-hash-table :test 'equal)))
   (dolist (seller input)
-    (dotimes (i (- (length seller) 4))
-      (let* ((part (take 5 seller))
-	     (key (aoc-calc-key part))
-	     (v (car part)))
-	
-	(puthash key 	       
-		 (+ v (gethash key groups 0))
-		 groups)
-      (setq seller (cdr seller)))))
+    (let ((points (aoc-find-price-points seller)))
+      (dolist (key (hash-table-keys points))
+        (puthash key
+             (+ (gethash key points)
+                (gethash key groups 0))
+             groups))))
+    
   (aoc-answer (car
 	       (seq-sort '> (hash-table-values groups)))))
 
