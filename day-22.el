@@ -39,15 +39,67 @@
 (defun aoc-c (x)
   (aoc-mix-prune (* 2048 x) x))
 
+
+(defun aoc-calc-prices (secret iterations)
+  (let ((x secret))
+    (dotimes (i iterations)
+      (setq x (aoc-a x))
+      (setq x (aoc-b x))
+      (setq x (aoc-c x)))
+    x))
+		  
+
+
 ;; Part A
 (aoc-answer
  (apply '+
 	(mapcar (lambda (x)
-		  (dotimes (i 2000)
-		    (setq x (aoc-a x))
-		    (setq x (aoc-b x))
-		    (setq x (aoc-c x)))
-		  x)
-		  
-		(mapcar 'string-to-number
-			(aoc-read-input)))))
+		  (aoc-calc-prices x 2000))
+	    (mapcar 'string-to-number
+		    (aoc-read-input)))))
+
+;; Part B
+(defun aoc-calc-prices (secret iterations)
+  (let ((out '())
+	(x secret))
+    (dotimes (i iterations)
+      (setq x (aoc-a x))
+      (setq x (aoc-b x))
+      (setq x (aoc-c x))
+      (setq out (push x out)))
+    out))
+
+(defun aoc-calc-key (data)
+  (let ((out '())
+	(data data))
+    (dotimes (i 4)
+      (push (- (cadr data)
+	       (car data))
+	    out)
+      (setq data (cdr data)))
+    out))
+
+(let* ((input (aoc-read-input))
+       (input (mapcar 'string-to-number input))
+       (input (mapcar (lambda (x)
+		(aoc-calc-prices x 2000))
+	      input))
+       (input (mapcar (lambda (x)
+
+			 (mapcar (lambda (x) (% x 10))
+				 x))
+		      input))
+       (groups (make-hash-table :test 'equal)))
+  (dolist (seller input)
+    (dotimes (i (- (length seller) 4))
+      (let* ((part (take 5 seller))
+	     (key (aoc-calc-key part))
+	     (v (car part)))
+	
+	(puthash key 	       
+		 (+ v (gethash key groups 0))
+		 groups)
+      (setq seller (cdr seller)))))
+  (aoc-answer (car
+	       (seq-sort '> (hash-table-values groups)))))
+
